@@ -5,7 +5,9 @@ from random import uniform as rnd
 from ImageFinder.ImageFinder import get_images_links as find_image
 from streamlit_echarts import st_echarts
 
-st.set_page_config(page_title="Food Recommendation ChatBot", page_icon="🖥️",layout="wide")
+st.set_page_config(page_title="Food Recommendation using Chatbot", page_icon="💪",layout="wide")
+
+
 
 nutritions_values=['Calories','FatContent','SaturatedFatContent','CholesterolContent','SodiumContent','CarbohydrateContent','FiberContent','SugarContent','ProteinContent']
 # Streamlit states initialization
@@ -86,18 +88,17 @@ class Display:
         self.weights=[1,0.9,0.8,0.6]
         self.losses=['-0 kg/week','-0.25 kg/week','-0.5 kg/week','-1 kg/week']
         pass
-    st.markdown(
-        "-------------------------------------------------------------------------------"
-    )
 
     def display_bmi(self,person):
         st.header('BMI CALCULATOR')
         bmi_string,category,color = person.display_result()
-        st.metric(label="Body Mass Index (BMI)", value=bmi_string )
+        st.metric(label="Body Mass Index (BMI)", value=bmi_string)
         new_title = f'<p style="font-family:sans-serif; color:{color}; font-size: 25px;">{category}</p>'
         st.markdown(new_title, unsafe_allow_html=True)
         st.markdown(
-            "--------------------------------------------------------------------")   
+            """
+            Healthy BMI range: 18.5 kg/m² - 25 kg/m².
+            """)   
 
     def display_calories(self,person):
         st.header('CALORIES CALCULATOR')        
@@ -106,7 +107,7 @@ class Display:
         for plan,weight,loss,col in zip(self.plans,self.weights,self.losses,st.columns(4)):
             with col:
                 st.metric(label=plan,value=f'{round(maintain_calories*weight)} Calories/day',delta=loss,delta_color="inverse")
-                st.markdown("-----------------------------------------------------------------------------")
+
     def display_recommendation(self,person,recommendations):
         st.header('DIET RECOMMENDATOR')  
         with st.spinner('Generating recommendations...'): 
@@ -114,7 +115,7 @@ class Display:
             st.subheader('Recommended recipes:')
             for meal_name,column,recommendation in zip(meals,st.columns(len(meals)),recommendations):
                 with column:
-                    st.markdown(f'<div style="text-align: center;">{meal_name.upper()}</div>', unsafe_allow_html=True) 
+                    #st.markdown(f'<div style="text-align: center;">{meal_name.upper()}</div>', unsafe_allow_html=True) 
                     st.markdown(f'##### {meal_name.upper()}')    
                     for recipe in recommendation:
                         
@@ -239,13 +240,13 @@ class Display:
         
 
 display=Display()
-title="<h1 style='text-align: center;'>Food Recommendation Using Chatbot</h1>"
+title="<h1 style='text-align: center;'>Food Recommendation using Chatbot</h1>"
 st.markdown(title, unsafe_allow_html=True)
 with st.form("recommendation_form"):
-    st.write("")
-    age = st.number_input('Age',min_value=21, max_value=120, step=1)
+    st.write("Modify the values and click the Generate button to use")
+    age = st.number_input('Age',min_value=2, max_value=120, step=1)
     height = st.number_input('Height(cm)',min_value=50, max_value=300, step=1)
-    weight = st.number_input('Weight(kg)',min_value=70, max_value=300, step=1)
+    weight = st.number_input('Weight(kg)',min_value=10, max_value=300, step=1)
     gender = st.radio('Gender',('Male','Female'))
     activity = st.select_slider('Activity',options=['Little/no exercise', 'Light exercise', 'Moderate exercise (3-5 days/wk)', 'Very active (6-7 days/wk)', 
     'Extra active (very active & physical job)'])
@@ -267,8 +268,7 @@ if generated:
         display.display_bmi(person)
     with st.container():
         display.display_calories(person)
-        st.markdown("---------------------------------------------------------------------------------------")
-    with st.spinner('Please Wait Chatbot is Generating Recommendations For you!....'):     
+    with st.spinner('Please Wait...'):     
         recommendations=person.generate_recommendations()
         st.session_state.recommendations=recommendations
         st.session_state.person=person
